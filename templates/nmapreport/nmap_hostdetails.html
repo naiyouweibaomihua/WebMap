@@ -82,6 +82,7 @@
 							<div class="hindex wmcard">{{ v.hostindex }}</div>
 							{{ v.newlabelout|safe }}
 
+							<!-- # mTODO 这就是文件详情页的主机列表-->
 							{% if v.po != 0 or v.pc != 0 or v.pf != 0 %}
 								<h5><a href="/report/{{ i }}" class="blue-text text-darken-3">{{ i }}</a></h5>{{ v.hostname|safe }}
 							{% else %}
@@ -111,6 +112,10 @@
 						<div class="col s2 small">
 							<b>PORTS</b><br>
 							{{ v.ports|safe }}
+						</div>
+						<div class="col s12 small">
+							<b>OSMATCH</b><br>
+							{{ v.osmatch|safe }}
 						</div>
 					</div>
 				</div>

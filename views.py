@@ -27,7 +27,7 @@ def setscanfile(request, scanfile):
 	if scanfile == 'unset':
 		if 'scanfile' in request.session:
 			del(request.session['scanfile'])
-
+# mTODO 找到了，Show all nmap scan的视图就是这一个，然后details函数里，对应的是文件的详情页
 	return render(request, 'nmapreport/nmap_hostdetails.html', { 'js': '<script> location.href="/"; </script>' })
 
 
@@ -94,6 +94,7 @@ def details(request, address):
 			for ai in i['address']:
 				if ai['@addrtype'] == 'ipv4':
 					saddress = ai['@addr'] 
+		
 
 		if str(saddress) == address:
 			hostname = ''
@@ -457,7 +458,7 @@ def index(request, filterservice="", filterportid=""):
 					hostname += '<div class="small grey-text"><b>'+i['hostnames']['hostname']['@type']+':</b> '+i['hostnames']['hostname']['@name']+'</div>'
 
 		po,pc,pf = 0,0,0
-		ss,pp,ost = {},{},{}
+		ss,pp,ost,moss = {},{},{},{}
 		lastportid = 0
 
 		if '@addr' in i['address']:
@@ -552,6 +553,23 @@ def index(request, filterservice="", filterportid=""):
 					ports['filtered'] = (ports['filtered'] + 1)
 					pf = (pf + 1)
 
+
+			if 'os' in i and 'osmatch' in i['os']:
+				for osbj in i['os']['osmatch']:
+					if type(osbj) is dict:
+						mos = osbj
+					else:
+						mos = i['os']['osmatch']
+
+					if lastportid == mos['@name']:
+						continue
+					else:
+						lastportid = mos['@name']
+
+					moss[mos['@name']] = mos['@name']
+				print(moss)
+
+
 			services = ''
 			for s in ss:
 				if filterservice != ss[s]:
@@ -626,7 +644,7 @@ def index(request, filterservice="", filterportid=""):
 						robj = re.search('([a-zA-Z0-9\_]+)\/([0-9\.]+)', eis)
 						tags.append(robj.group(1)+' '+robj.group(2))
 
-
+				# mTODO 这就是主机列表的字典咯
 				r['tr'][address] = {
 					'hostindex': str(hostindex),
 					'hostname': hostname,
@@ -648,7 +666,8 @@ def index(request, filterservice="", filterportid=""):
 					'notesb64': notesb64,
 					'notesout': notesout,
 					'cveout': cveout,
-					'cvecount': cvecount
+					'cvecount': cvecount,
+					'osmatch':moss
 				}
 
 				hostindex = (hostindex + 1)
